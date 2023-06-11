@@ -1,0 +1,19 @@
+---
+# Usage:
+# $  ansible-playbook play_save_config.yaml -i inventory.txt -f 5
+
+- name: Save Router Configuration
+  hosts: routers
+  connection: network_cli
+  gather_facts: no
+
+  tasks:
+    # This will save files in the 'backup' folder
+    - name: Backup current switch config (ios)
+      ios_config:
+        backup: yes
+        backup_options:
+          filename: "{{ inventory_hostname}}.cfg"
+          dir_path: lab/configs
+      register: backup_ios_location
+      when: ansible_network_os == 'ios'

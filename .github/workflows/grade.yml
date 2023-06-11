@@ -1,0 +1,38 @@
+name: Design Labs Configuration Check
+
+on:
+  push:
+    branches:
+      - 'lab*'
+jobs:
+  lab_config_grading:
+    runs-on: ubuntu-latest
+    container:
+      image: martimy/netauto:0.2
+      env:
+        BATFISH_SERVER: batfish
+    services:
+      batfish:
+        image: batfish/allinone
+        ports:
+          - 8888:8888
+          - 9997:9997
+          - 9996:9996
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Lab Parser Check
+        run: python .templates-do-not-delete/parser_check.py
+
+      - name: Lab 1-4 Batfish Analysis
+        if: |
+          startsWith(github.ref, 'refs/heads/lab1') ||
+          startsWith(github.ref, 'refs/heads/lab2') || 
+          startsWith(github.ref, 'refs/heads/lab3') || 
+          startsWith(github.ref, 'refs/heads/lab4')
+        run: python .templates-do-not-delete/check_lab_1.py
+
+      - name: Lab 5 Batfish Analysis
+        if: startsWith(github.ref, 'refs/heads/lab5')
+        run: python .templates-do-not-delete/check_lab_5.py

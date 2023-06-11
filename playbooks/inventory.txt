@@ -1,0 +1,19 @@
+[spine]
+R11 ansible_host=10.1.155.11
+R12 ansible_host=10.1.155.12
+
+[leaf]
+R21 ansible_host=10.1.155.21
+R22 ansible_host=10.1.155.22
+R23 ansible_host=10.1.155.23
+
+[routers:children]
+spine
+leaf
+
+[routers:vars]
+ansible_connection=network_cli
+ansible_python_interpreter=/usr/bin/python3
+ansible_network_os=ios
+ansible_user=student
+ansible_ssh_pass=Meilab123

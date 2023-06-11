@@ -1,0 +1,35 @@
+#!/bin/bash -eu
+
+z40=0000000000000000000000000000000000000000
+
+info()    { printf "\\e[32m[INFO]\\e[0m    %s\\n" "$*" >&2 ; }
+error()   { printf "\\e[31m[ERROR]\\e[0m   %s\\n" "$*" >&2 ; }
+
+validate() {
+    errors=0
+
+    pushd "$(git rev-parse --show-toplevel)" &> /dev/null
+
+    info "Running unit tests"
+    if !  python3 -m unittest discover -s tests/unit ; then
+        error "Unit tests failing"
+        ((errors++))
+    fi
+
+    popd &> /dev/null
+
+    if [ $errors -gt 0 ]; then
+        return 1
+    else
+        return 0
+    fi
+}
+
+# shellcheck disable=SC2034
+while read -r local_ref local_hash remote_ref remote_hash; do
+    if [ "$local_hash" != "$z40" ]; then
+        validate || exit 1
+    fi
+done
+
+exit 0
